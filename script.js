@@ -23,6 +23,8 @@ const allergyPreview = document.getElementById('allergy-preview');
 const randomAllergyName = document.getElementById('random-allergy-name');
 const randomAllergyDefinition = document.getElementById('random-allergy-definition');
 
+const loadingSpinner = document.getElementById('loading-spinner');
+
 let userAllergies = [];
 let allergyImageText = null; // To store text extracted from allergy image
 
@@ -163,34 +165,37 @@ const allergiesData = [
 
 // Function to display a random allergy in the "Did You Know?" section based on user profile
 function displayRandomAllergy() {
+    let relevantAllergies = [];
+
     if (userAllergies.length === 0) {
-        // If no allergies selected, display a random tip from allPossibleAllergens
+        // If no allergies selected, use all possible allergens for tips
+        relevantAllergies = allPossibleAllergens;
+    } else {
+        // Filter allergiesData to include only user-selected allergens
+        relevantAllergies = allergiesData.filter(a => userAllergies.includes(a.name));
+    }
+
+    if (relevantAllergies.length === 0) {
+        // If no relevant allergies found in allergiesData, pick from allPossibleAllergens with a generic message
         const randomIndex = Math.floor(Math.random() * allPossibleAllergens.length);
         const allergenName = allPossibleAllergens[randomIndex];
-        const allergyInfo = allergiesData.find(a => a.name.toLowerCase() === allergenName.toLowerCase());
-
-        if (allergyInfo) {
-            randomAllergyName.textContent = allergyInfo.name;
-            randomAllergyDefinition.textContent = allergyInfo.definition;
-        } else {
-            randomAllergyName.textContent = allergenName;
-            randomAllergyDefinition.textContent = "Learn more about this allergen to stay safe!";
-        }
+        randomAllergyName.textContent = allergenName;
+        randomAllergyDefinition.textContent = "Learn more about this allergen to stay safe!";
     } else {
-        // Display a tip related to one of the user's selected allergens
-        const randomIndex = Math.floor(Math.random() * userAllergies.length);
-        const selectedAllergen = userAllergies[randomIndex];
-        const allergyInfo = allergiesData.find(a => a.name.toLowerCase() === selectedAllergen.toLowerCase());
-
-        if (allergyInfo) {
-            randomAllergyName.textContent = allergyInfo.name;
-            randomAllergyDefinition.textContent = allergyInfo.definition;
-        } else {
-            // If no predefined definition, provide a generic message
-            randomAllergyName.textContent = selectedAllergen;
-            randomAllergyDefinition.textContent = "Learn more about this allergen to stay safe!";
-        }
+        // Display a tip related to one of the relevant allergens
+        const randomIndex = Math.floor(Math.random() * relevantAllergies.length);
+        const selectedAllergen = relevantAllergies[randomIndex];
+        randomAllergyName.textContent = selectedAllergen.name;
+        randomAllergyDefinition.textContent = selectedAllergen.definition;
     }
+
+    // Add animation by removing and re-adding the animation class
+    randomAllergyName.classList.remove('fadeIn');
+    randomAllergyDefinition.classList.remove('fadeIn');
+    void randomAllergyName.offsetWidth; // Trigger reflow
+    void randomAllergyDefinition.offsetWidth; // Trigger reflow
+    randomAllergyName.classList.add('fadeIn');
+    randomAllergyDefinition.classList.add('fadeIn');
 }
 
 // Function to get analysis result based on userAllergies and ingredientsText
@@ -203,18 +208,15 @@ function getAnalysisResult(ingredientsText) {
         };
     }
 
-    // Convert ingredients text to lowercase for case-insensitive matching
-    const lowerCaseIngredients = ingredientsText.toLowerCase();
-
     // Initialize an array to hold detected allergens
     let detectedAllergens = [];
 
     // Check each user-saved allergen against the ingredients text
     userAllergies.forEach(allergen => {
         const lowerCaseAllergen = allergen.toLowerCase();
-        // Use word boundaries to match whole words only
-        const regex = new RegExp(`\\b${lowerCaseAllergen}\\b`, 'i');
-        if (regex.test(lowerCaseIngredients)) {
+        const lowerCaseIngredients = ingredientsText.toLowerCase();
+        // Use includes to detect substrings or partial matches
+        if (lowerCaseIngredients.includes(lowerCaseAllergen)) {
             detectedAllergens.push(allergen);
         }
     });
@@ -253,11 +255,15 @@ function performAnalysis(ingredientsText) {
             resultsMessage.classList.add("alert-success");
             resultIcon.className = "fas fa-check-circle me-2"; // Font Awesome check icon
         }
+
+        // Show the results with animation
+        resultsMessage.classList.add('show');
     } else {
         // This case shouldn't occur due to updated logic
         resultsMessage.innerHTML = "No ingredients provided for analysis.";
         resultsMessage.classList.remove("alert-danger", "alert-success");
         resultIcon.className = "";
+        resultsMessage.classList.remove('show');
     }
 }
 
@@ -275,6 +281,7 @@ scanButton.addEventListener('click', () => {
             resultsMessage.classList.remove("alert-danger");
             resultsMessage.classList.add("alert-success");
             resultIcon.className = "fas fa-check-circle me-2"; // Font Awesome check icon
+            resultsMessage.classList.add('show');
             extractedIngredientsTextarea.value = "";
         } else {
             // Randomly decide
@@ -293,6 +300,8 @@ scanButton.addEventListener('click', () => {
                 resultsMessage.classList.add("alert-success");
                 resultIcon.className = "fas fa-check-circle me-2"; // Font Awesome check icon
             }
+            // Show the results with animation
+            resultsMessage.classList.add('show');
             // Clear extracted ingredients textarea
             extractedIngredientsTextarea.value = "";
         }
@@ -374,6 +383,9 @@ captureButton.addEventListener('click', () => {
 
 // Event listener for the "Analyze Image" button
 analyzeImageButton.addEventListener('click', async () => {
+    // Show loading spinner
+    loadingSpinner.classList.remove('d-none');
+
     // Check if there's an image on the canvas
     if (capturedImageCanvas.style.display === 'none') {
         // Proceed to randomly detect or not
@@ -383,6 +395,7 @@ analyzeImageButton.addEventListener('click', async () => {
             resultsMessage.classList.remove("alert-danger");
             resultsMessage.classList.add("alert-success");
             resultIcon.className = "fas fa-check-circle me-2"; // Font Awesome check icon
+            resultsMessage.classList.add('show');
             extractedIngredientsTextarea.value = "";
         } else {
             const isAllergenDetected = Math.random() < 0.5; // 50% chance
@@ -400,9 +413,14 @@ analyzeImageButton.addEventListener('click', async () => {
                 resultsMessage.classList.add("alert-success");
                 resultIcon.className = "fas fa-check-circle me-2"; // Font Awesome check icon
             }
+            // Show the results with animation
+            resultsMessage.classList.add('show');
             // Clear extracted ingredients textarea
             extractedIngredientsTextarea.value = "";
         }
+
+        // Hide loading spinner
+        loadingSpinner.classList.add('d-none');
         return; // Stop execution
     }
 
@@ -442,8 +460,14 @@ analyzeImageButton.addEventListener('click', async () => {
                 resultIcon.className = "fas fa-check-circle me-2"; // Font Awesome check icon
             }
         }
+        // Show the results with animation
+        resultsMessage.classList.add('show');
         // Clear extracted ingredients textarea
         extractedIngredientsTextarea.value = "";
+
+    } finally {
+        // Hide loading spinner
+        loadingSpinner.classList.add('d-none');
     }
 });
 
@@ -457,9 +481,11 @@ imageUpload.addEventListener('change', (event) => {
             img.onload = () => {
                 capturedImageCanvas.width = img.width;
                 capturedImageCanvas.height = img.height;
-                capturedImageContext.drawImage(img, 0, 0);
+                capturedImageContext.drawImage(img, 0, 0, capturedImageCanvas.width, capturedImageCanvas.height);
                 capturedImageCanvas.style.display = 'block';
                 analyzeImageButton.style.display = 'inline-block';
+                resultsMessage.classList.remove('show');
+                extractedIngredientsTextarea.value = "";
             };
             img.src = e.target.result;
         };
@@ -491,19 +517,24 @@ allergyImageUpload.addEventListener('change', async (event) => {
 
                 // Check if the extracted allergy is already in userAllergies
                 if (!userAllergies.some(a => a.toLowerCase() === formattedAllergy.toLowerCase())) {
-                    userAllergies.push(formattedAllergy);
-                    // Update the allergies select field
-                    for (let option of allergiesSelect.options) {
-                        if (option.value.toLowerCase() === formattedAllergy.toLowerCase()) {
-                            option.selected = true;
-                            break;
+                    // Check if the extracted allergen exists in allPossibleAllergens
+                    if (allPossibleAllergens.includes(formattedAllergy)) {
+                        userAllergies.push(formattedAllergy);
+                        // Update the allergies select field
+                        for (let option of allergiesSelect.options) {
+                            if (option.value.toLowerCase() === formattedAllergy.toLowerCase()) {
+                                option.selected = true;
+                                break;
+                            }
                         }
+                        // Refresh Bootstrap Select to show new selection
+                        $('.selectpicker').selectpicker('refresh');
+                        // Save updated allergies to localStorage
+                        localStorage.setItem('allergies', userAllergies.join(', '));
+                        alert(`Allergy "${formattedAllergy}" added to your profile.`);
+                    } else {
+                        alert(`Allergy "${formattedAllergy}" is not recognized in the allergen list.`);
                     }
-                    // Refresh Bootstrap Select to show new selection
-                    $('.selectpicker').selectpicker('refresh');
-                    // Save updated allergies to localStorage
-                    localStorage.setItem('allergies', userAllergies.join(', '));
-                    alert(`Allergy "${formattedAllergy}" added to your profile.`);
                 } else {
                     alert(`Allergy "${formattedAllergy}" is already in your profile.`);
                 }
