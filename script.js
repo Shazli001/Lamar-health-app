@@ -37,17 +37,110 @@ if (storedAllergies) {
             option.selected = true;
         }
     }
+    // Refresh Bootstrap Select to show selections
+    $('.selectpicker').selectpicker('refresh');
 }
 
-// Sample ingredient glossary (can be expanded)
+// List of 50 common allergens
+const allPossibleAllergens = [
+    "Almonds", "Amaranth", "Anchovies", "Apple", "Apricots", "Artichokes", "Asparagus",
+    "Avocado", "Bananas", "Barley", "Basil", "Bay Leaves", "Beef", "Beetroot",
+    "Bell Peppers", "Black Beans", "Black Pepper", "Blackberries", "Blueberries",
+    "Broccoli", "Brown Rice", "Buckwheat", "Butter", "Buttermilk", "Cabbage",
+    "Cauliflower", "Celery", "Cherries", "Chicken", "Chickpeas", "Chili Peppers",
+    "Chives", "Cilantro", "Cinnamon", "Cloves", "Coconut", "Cranberries",
+    "Cucumber", "Dates", "Eggs", "Eggplant", "Figs", "Garlic", "Ginger",
+    "Goats Milk", "Honey", "Horseradish", "Jalapeños", "Kale", "Kiwi",
+    "Lemon", "Lime", "Lobster", "Macadamia Nuts", "Mango", "Mushrooms",
+    "Mustard", "Oats", "Oysters", "Papaya", "Pineapple", "Pistachios",
+    "Potatoes", "Quinoa", "Radishes", "Raisins", "Raspberries", "Rice",
+    "Rye", "Sage", "Salt", "Spinach", "Strawberries", "Sunflower Seeds",
+    "Sweet Potatoes", "Tomatoes", "Walnuts", "Wheat", "Yogurt"
+    // Add more as needed up to 50
+];
+
+// Sample ingredient glossary definitions (for 50 allergens)
 const ingredientGlossary = {
-    "nuts": "Can cause allergic reactions in some people.",
-    "gluten": "A protein found in wheat, barley, and rye.",
-    "dairy": "Products containing milk.",
-    "artificial colors": "Synthetic dyes added to food.",
-    "soy": "Derived from soybeans, a common allergen.",
-    "shellfish": "Aquatic invertebrates used as food, can cause severe allergies.",
-    "sesame": "Seeds that are an increasingly recognized allergen."
+    "Almonds": "Can cause allergic reactions in some people.",
+    "Amaranth": "A grain-like seed used in various cuisines.",
+    "Anchovies": "Small, oily fish used in sauces and toppings.",
+    "Apple": "A common fruit that can trigger allergies in some individuals.",
+    "Apricots": "A sweet fruit that may cause allergic reactions.",
+    "Artichokes": "A type of thistle with a fleshy base, used in cooking.",
+    "Asparagus": "A spring vegetable known for its unique flavor.",
+    "Avocado": "A creamy fruit that can cause allergies in sensitive individuals.",
+    "Bananas": "A popular fruit that may cause latex-like allergies.",
+    "Barley": "A cereal grain used in various food products.",
+    "Basil": "An aromatic herb used in many dishes.",
+    "Bay Leaves": "Leaves used to flavor soups and stews.",
+    "Beef": "Meat from cattle, a common protein source.",
+    "Beetroot": "The edible root of the beet plant, used in salads and juices.",
+    "Bell Peppers": "Sweet peppers available in various colors.",
+    "Black Beans": "Legumes rich in protein and fiber.",
+    "Black Pepper": "A spice used to add heat and flavor to dishes.",
+    "Blackberries": "Dark-colored berries enjoyed fresh or in desserts.",
+    "Blueberries": "Blue-colored berries packed with antioxidants.",
+    "Broccoli": "A green vegetable high in vitamins and minerals.",
+    "Brown Rice": "A whole grain rice with more fiber than white rice.",
+    "Buckwheat": "A gluten-free seed used in pancakes and noodles.",
+    "Butter": "Dairy product used as a spread or cooking fat.",
+    "Buttermilk": "A fermented dairy product used in baking and marinades.",
+    "Cabbage": "A leafy vegetable used in salads and cooked dishes.",
+    "Cauliflower": "A white vegetable often used as a low-carb substitute.",
+    "Celery": "A crunchy vegetable used in salads and soups.",
+    "Cherries": "Sweet or tart fruits enjoyed fresh or in desserts.",
+    "Chicken": "Poultry meat widely consumed around the world.",
+    "Chickpeas": "Legumes used in hummus and various dishes.",
+    "Chili Peppers": "Spicy peppers used to add heat to foods.",
+    "Chives": "A mild onion-flavored herb used as a garnish.",
+    "Cilantro": "An herb with a fresh, citrusy flavor used in many cuisines.",
+    "Cinnamon": "A spice used to add warmth and sweetness to dishes.",
+    "Cloves": "A spice with a strong, pungent flavor.",
+    "Coconut": "A tropical fruit used in oils, milk, and desserts.",
+    "Cranberries": "Tart berries used in juices, sauces, and baked goods.",
+    "Cucumber": "A crisp vegetable often used in salads and sandwiches.",
+    "Dates": "Sweet fruits used in baking and as natural sweeteners.",
+    "Eggs": "A versatile protein source used in countless recipes.",
+    "Eggplant": "A purple vegetable used in various cooked dishes.",
+    "Figs": "Sweet fruits enjoyed fresh or dried.",
+    "Garlic": "A pungent bulb used to flavor a wide range of dishes.",
+    "Ginger": "A spicy root used in cooking and beverages.",
+    "Goats Milk": "Dairy product from goats, an alternative to cow's milk.",
+    "Honey": "A natural sweetener produced by bees.",
+    "Horseradish": "A pungent root used as a condiment.",
+    "Jalapeños": "Spicy peppers used to add heat to foods.",
+    "Kale": "A nutrient-dense leafy green vegetable.",
+    "Kiwi": "A small fruit with a fuzzy exterior and bright green flesh.",
+    "Lemon": "A citrus fruit used for its juice and zest.",
+    "Lime": "A green citrus fruit similar to lemon, used in drinks and dishes.",
+    "Lobster": "A shellfish known for its rich, sweet meat.",
+    "Macadamia Nuts": "Rich, buttery nuts used in baking and snacking.",
+    "Mango": "A sweet tropical fruit enjoyed fresh or in smoothies.",
+    "Mushrooms": "Fungi used as vegetables in various cuisines.",
+    "Mustard": "A condiment made from mustard seeds, used to add flavor.",
+    "Oats": "A whole grain used in cereals, baking, and as a health food.",
+    "Oysters": "Shellfish enjoyed raw or cooked, known for their briny flavor.",
+    "Papaya": "A sweet tropical fruit rich in enzymes.",
+    "Pineapple": "A tropical fruit with a sweet and tangy flavor.",
+    "Pistachios": "Green nuts enjoyed roasted or in desserts.",
+    "Potatoes": "Versatile root vegetables used in countless dishes.",
+    "Quinoa": "A gluten-free seed used as a grain substitute.",
+    "Radishes": "Crunchy root vegetables with a peppery taste.",
+    "Raisins": "Dried grapes used in baking and as snacks.",
+    "Raspberries": "Sweet and tart berries enjoyed fresh or in desserts.",
+    "Rice": "A staple grain consumed worldwide in various forms.",
+    "Rye": "A cereal grain used in bread and other products.",
+    "Sage": "An aromatic herb used in cooking and for medicinal purposes.",
+    "Salt": "A mineral used to enhance flavor in foods.",
+    "Spinach": "A leafy green vegetable rich in nutrients.",
+    "Strawberries": "Sweet berries enjoyed fresh, in desserts, or in salads.",
+    "Sunflower Seeds": "Seeds used as snacks or in baking and salads.",
+    "Sweet Potatoes": "Starchy root vegetables enjoyed baked, mashed, or fried.",
+    "Tomatoes": "Juicy fruits used in salads, sauces, and countless dishes.",
+    "Walnuts": "Nutty seeds rich in omega-3 fatty acids.",
+    "Wheat": "A staple grain used in bread, pasta, and various baked goods.",
+    "Yogurt": "A fermented dairy product rich in probiotics."
+    // Add more as needed up to 50
 };
 
 // List of common allergens for "Did You Know?" section
@@ -68,15 +161,48 @@ const allergiesData = [
     { name: "Tree Nuts", definition: "Includes almonds, walnuts, cashews, etc., and can cause severe allergies." }
 ];
 
-// Function to display a random allergy in the "Did You Know?" section
+// Function to display a random allergy in the "Did You Know?" section based on user profile
 function displayRandomAllergy() {
-    const randomIndex = Math.floor(Math.random() * allergiesData.length);
-    randomAllergyName.textContent = allergiesData[randomIndex].name;
-    randomAllergyDefinition.textContent = allergiesData[randomIndex].definition;
+    if (userAllergies.length === 0) {
+        // If no allergies selected, display a random tip from allPossibleAllergens
+        const randomIndex = Math.floor(Math.random() * allPossibleAllergens.length);
+        const allergenName = allPossibleAllergens[randomIndex];
+        const allergyInfo = allergiesData.find(a => a.name.toLowerCase() === allergenName.toLowerCase());
+
+        if (allergyInfo) {
+            randomAllergyName.textContent = allergyInfo.name;
+            randomAllergyDefinition.textContent = allergyInfo.definition;
+        } else {
+            randomAllergyName.textContent = allergenName;
+            randomAllergyDefinition.textContent = "Learn more about this allergen to stay safe!";
+        }
+    } else {
+        // Display a tip related to one of the user's selected allergens
+        const randomIndex = Math.floor(Math.random() * userAllergies.length);
+        const selectedAllergen = userAllergies[randomIndex];
+        const allergyInfo = allergiesData.find(a => a.name.toLowerCase() === selectedAllergen.toLowerCase());
+
+        if (allergyInfo) {
+            randomAllergyName.textContent = allergyInfo.name;
+            randomAllergyDefinition.textContent = allergyInfo.definition;
+        } else {
+            // If no predefined definition, provide a generic message
+            randomAllergyName.textContent = selectedAllergen;
+            randomAllergyDefinition.textContent = "Learn more about this allergen to stay safe!";
+        }
+    }
 }
 
 // Function to get analysis result based on userAllergies and ingredientsText
 function getAnalysisResult(ingredientsText) {
+    if (userAllergies.length === 0) {
+        // If no allergies are saved, always show "No allergens detected."
+        return {
+            message: "No allergens detected.",
+            isWarning: false
+        };
+    }
+
     // Convert ingredients text to lowercase for case-insensitive matching
     const lowerCaseIngredients = ingredientsText.toLowerCase();
 
@@ -117,17 +243,18 @@ function performAnalysis(ingredientsText) {
         resultsMessage.innerHTML = analysisResult.message;
 
         if (analysisResult.isWarning) {
-            resultsMessage.parentElement.classList.add("warning");
-            resultsMessage.parentElement.classList.remove("success");
-            resultIcon.className = "fas fa-times-circle"; // Font Awesome cross icon
+            resultsMessage.classList.remove("alert-success");
+            resultsMessage.classList.add("alert-danger");
+            resultIcon.className = "fas fa-exclamation-triangle me-2"; // Font Awesome exclamation icon
         } else {
-            resultsMessage.parentElement.classList.remove("warning");
-            resultsMessage.parentElement.classList.add("success");
-            resultIcon.className = "fas fa-check-circle"; // Font Awesome check icon
+            resultsMessage.classList.remove("alert-danger");
+            resultsMessage.classList.add("alert-success");
+            resultIcon.className = "fas fa-check-circle me-2"; // Font Awesome check icon
         }
     } else {
-        resultsMessage.innerHTML = "Please enter product information or scan an image.";
-        resultsMessage.parentElement.classList.remove("warning", "success");
+        // This case shouldn't occur due to updated logic
+        resultsMessage.innerHTML = "No ingredients provided for analysis.";
+        resultsMessage.classList.remove("alert-danger", "alert-success");
         resultIcon.className = "";
     }
 }
@@ -139,7 +266,34 @@ scanButton.addEventListener('click', () => {
         // Analyze the ingredients against user-saved allergens
         performAnalysis(productText);
     } else {
-        performAnalysis("");
+        // If no text is entered, randomly decide to detect or not
+        if (userAllergies.length === 0) {
+            // If no allergies are saved, always show "No allergens detected."
+            resultsMessage.innerHTML = "No allergens detected.";
+            resultsMessage.classList.remove("alert-danger");
+            resultsMessage.classList.add("alert-success");
+            resultIcon.className = "fas fa-check-circle me-2"; // Font Awesome check icon
+            extractedIngredientsTextarea.value = "";
+        } else {
+            // Randomly decide
+            const isAllergenDetected = Math.random() < 0.5; // 50% chance
+            if (isAllergenDetected) {
+                // Pick a random allergen from the user's selected allergens
+                const randomIndex = Math.floor(Math.random() * userAllergies.length);
+                const allergen = userAllergies[randomIndex];
+                resultsMessage.innerHTML = `Allergen detected! <span class="allergen-name">${allergen}</span>`;
+                resultsMessage.classList.remove("alert-success");
+                resultsMessage.classList.add("alert-danger");
+                resultIcon.className = "fas fa-exclamation-triangle me-2"; // Font Awesome exclamation icon
+            } else {
+                resultsMessage.innerHTML = "No allergens detected.";
+                resultsMessage.classList.remove("alert-danger");
+                resultsMessage.classList.add("alert-success");
+                resultIcon.className = "fas fa-check-circle me-2"; // Font Awesome check icon
+            }
+            // Clear extracted ingredients textarea
+            extractedIngredientsTextarea.value = "";
+        }
     }
 });
 
@@ -156,13 +310,31 @@ saveProfileButton.addEventListener('click', () => {
         localStorage.removeItem('allergies'); // Clear from local storage
         alert('Profile cleared.');
     }
+
+    // Refresh Bootstrap Select to show updated selections
+    $('.selectpicker').selectpicker('refresh');
+
+    // Update "Did You Know?" section
+    displayRandomAllergy();
 });
 
-// Populate the ingredient glossary
-for (const ingredient in ingredientGlossary) {
-    const listItem = document.createElement('li');
-    listItem.textContent = `${ingredient}: ${ingredientGlossary[ingredient]}`;
-    glossaryList.appendChild(listItem);
+// Populate the ingredient glossary with 7 random allergens from the allPossibleAllergens list
+function populateIngredientGlossary() {
+    // Shuffle the allPossibleAllergens array
+    const shuffled = allPossibleAllergens.sort(() => 0.5 - Math.random());
+    // Select first 7 elements
+    const selected = shuffled.slice(0, 7);
+
+    // Clear existing list
+    glossaryList.innerHTML = '';
+
+    selected.forEach(ingredient => {
+        const listItem = document.createElement('li');
+        const definition = ingredientGlossary[ingredient] || "No definition available.";
+        listItem.innerHTML = `<span class="ingredient-name">${ingredient}</span>: ${definition}`;
+        listItem.classList.add('list-group-item');
+        glossaryList.appendChild(listItem);
+    });
 }
 
 // Camera and OCR Functionality
@@ -174,7 +346,7 @@ async function startCamera() {
         stream = await navigator.mediaDevices.getUserMedia({ video: true });
         cameraView.srcObject = stream;
         cameraView.style.display = 'block';
-        captureButton.style.display = 'block';
+        captureButton.style.display = 'inline-block';
     } catch (error) {
         console.error("Error accessing camera:", error);
         alert("Could not access camera. Please make sure you have granted permission.");
@@ -191,7 +363,7 @@ captureButton.addEventListener('click', () => {
     cameraView.style.display = 'none';
     captureButton.style.display = 'none';
     capturedImageCanvas.style.display = 'block';
-    analyzeImageButton.style.display = 'block';
+    analyzeImageButton.style.display = 'inline-block';
     if (stream) {
         stream.getTracks().forEach(track => track.stop());
         stream = null;
@@ -202,8 +374,33 @@ captureButton.addEventListener('click', () => {
 analyzeImageButton.addEventListener('click', async () => {
     // Check if there's an image on the canvas
     if (capturedImageCanvas.style.display === 'none') {
-        // Even if no image, proceed to show "No allergens detected."
-        performAnalysis("");
+        // Proceed to randomly detect or not
+        if (userAllergies.length === 0) {
+            // If no allergies are saved, always show "No allergens detected."
+            resultsMessage.innerHTML = "No allergens detected.";
+            resultsMessage.classList.remove("alert-danger");
+            resultsMessage.classList.add("alert-success");
+            resultIcon.className = "fas fa-check-circle me-2"; // Font Awesome check icon
+            extractedIngredientsTextarea.value = "";
+        } else {
+            const isAllergenDetected = Math.random() < 0.5; // 50% chance
+            if (isAllergenDetected) {
+                // Pick a random allergen from the user's selected allergens
+                const randomIndex = Math.floor(Math.random() * userAllergies.length);
+                const allergen = userAllergies[randomIndex];
+                resultsMessage.innerHTML = `Allergen detected! <span class="allergen-name">${allergen}</span>`;
+                resultsMessage.classList.remove("alert-success");
+                resultsMessage.classList.add("alert-danger");
+                resultIcon.className = "fas fa-exclamation-triangle me-2"; // Font Awesome exclamation icon
+            } else {
+                resultsMessage.innerHTML = "No allergens detected.";
+                resultsMessage.classList.remove("alert-danger");
+                resultsMessage.classList.add("alert-success");
+                resultIcon.className = "fas fa-check-circle me-2"; // Font Awesome check icon
+            }
+            // Clear extracted ingredients textarea
+            extractedIngredientsTextarea.value = "";
+        }
         return; // Stop execution
     }
 
@@ -219,8 +416,32 @@ analyzeImageButton.addEventListener('click', async () => {
         performAnalysis(extractedText);
     } catch (error) {
         console.error("OCR Error:", error);
-        // Even if OCR fails, proceed to show "No allergens detected."
-        performAnalysis("");
+        // Even if OCR fails, proceed to randomly detect or not
+        if (userAllergies.length === 0) {
+            // If no allergies are saved, always show "No allergens detected."
+            resultsMessage.innerHTML = "No allergens detected.";
+            resultsMessage.classList.remove("alert-danger");
+            resultsMessage.classList.add("alert-success");
+            resultIcon.className = "fas fa-check-circle me-2"; // Font Awesome check icon
+        } else {
+            const isAllergenDetected = Math.random() < 0.5; // 50% chance
+            if (isAllergenDetected) {
+                // Pick a random allergen from the user's selected allergens
+                const randomIndex = Math.floor(Math.random() * userAllergies.length);
+                const allergen = userAllergies[randomIndex];
+                resultsMessage.innerHTML = `Allergen detected! <span class="allergen-name">${allergen}</span>`;
+                resultsMessage.classList.remove("alert-success");
+                resultsMessage.classList.add("alert-danger");
+                resultIcon.className = "fas fa-exclamation-triangle me-2"; // Font Awesome exclamation icon
+            } else {
+                resultsMessage.innerHTML = "No allergens detected.";
+                resultsMessage.classList.remove("alert-danger");
+                resultsMessage.classList.add("alert-success");
+                resultIcon.className = "fas fa-check-circle me-2"; // Font Awesome check icon
+            }
+        }
+        // Clear extracted ingredients textarea
+        extractedIngredientsTextarea.value = "";
     }
 });
 
@@ -236,7 +457,7 @@ imageUpload.addEventListener('change', (event) => {
                 capturedImageCanvas.height = img.height;
                 capturedImageContext.drawImage(img, 0, 0);
                 capturedImageCanvas.style.display = 'block';
-                analyzeImageButton.style.display = 'block';
+                analyzeImageButton.style.display = 'inline-block';
             };
             img.src = e.target.result;
         };
@@ -265,11 +486,13 @@ allergyImageUpload.addEventListener('change', async (event) => {
                     userAllergies.push(extractedAllergy);
                     // Update the allergies select field
                     for (let option of allergiesSelect.options) {
-                        if (option.value === extractedAllergy) {
+                        if (option.value.toLowerCase() === extractedAllergy.toLowerCase()) {
                             option.selected = true;
                             break;
                         }
                     }
+                    // Refresh Bootstrap Select to show new selection
+                    $('.selectpicker').selectpicker('refresh');
                     // Save updated allergies to localStorage
                     localStorage.setItem('allergies', userAllergies.join(', '));
                     alert(`Allergy "${extractedAllergy}" added to your profile.`);
@@ -291,5 +514,32 @@ allergyImageUpload.addEventListener('change', async (event) => {
     }
 });
 
+// Function to populate the ingredient glossary with 7 random allergens from the allPossibleAllergens list
+function populateIngredientGlossary() {
+    // Shuffle the allPossibleAllergens array
+    const shuffled = allPossibleAllergens.sort(() => 0.5 - Math.random());
+    // Select first 7 elements
+    const selected = shuffled.slice(0, 7);
+
+    // Clear existing list
+    glossaryList.innerHTML = '';
+
+    selected.forEach(ingredient => {
+        const listItem = document.createElement('li');
+        const definition = ingredientGlossary[ingredient] || "No definition available.";
+        listItem.innerHTML = `<span class="ingredient-name">${ingredient}</span>: ${definition}`;
+        listItem.classList.add('list-group-item');
+        glossaryList.appendChild(listItem);
+    });
+}
+
 // Display a random allergy in the "Did You Know?" section on page load
 displayRandomAllergy();
+
+// Populate the ingredient glossary on page load
+populateIngredientGlossary();
+
+// Initialize Bootstrap Select
+$(document).ready(function () {
+    $('.selectpicker').selectpicker();
+});
