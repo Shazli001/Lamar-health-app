@@ -10,6 +10,7 @@ body {
     color: #333;
     margin: 0;
     padding: 0;
+    transition: background-color 0.3s ease;
 }
 
 /* Header Styling */
@@ -18,16 +19,19 @@ header {
     color: #fff;
     text-align: center;
     padding: 2rem 1rem;
+    transition: background-color 0.3s ease;
 }
 
 header h1 {
     font-size: 2.5rem;
     margin-bottom: 0.5rem;
+    animation: fadeInDown 1s ease-out;
 }
 
 header p {
     font-size: 1.2rem;
     margin: 0;
+    animation: fadeInUp 1s ease-out;
 }
 
 /* Card Titles */
@@ -35,6 +39,7 @@ header p {
     color: #007bff; /* Bootstrap Primary Color */
     font-weight: 600;
     margin-bottom: 1rem;
+    animation: fadeIn 1s ease-out;
 }
 
 /* Analysis Results Styling */
@@ -45,6 +50,14 @@ header p {
     padding: 0.75rem 1.25rem;
     border: 1px solid transparent;
     border-radius: 0.25rem;
+    opacity: 0;
+    transform: translateY(-20px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+#results-text.show {
+    opacity: 1;
+    transform: translateY(0);
 }
 
 #results-text.alert-success {
@@ -62,12 +75,14 @@ header p {
 #result-icon {
     font-size: 1.5em;
     margin-right: 10px;
+    animation: fadeIn 1s ease-out;
 }
 
 /* Allergen Name Styling */
 .allergen-name {
     color: #dc3545; /* Bootstrap Danger Color (Red) */
     font-weight: bold;
+    animation: bounceIn 1s;
 }
 
 /* Ingredient Glossary Styling */
@@ -75,11 +90,13 @@ header p {
     list-style-type: none;
     padding-left: 0;
     margin: 0;
+    animation: fadeIn 1s ease-out;
 }
 
 #glossary-list li {
     padding: 0.5rem 0;
     border-bottom: 1px solid #e9ecef;
+    animation: slideInLeft 0.5s ease-out;
 }
 
 #glossary-list li:last-child {
@@ -96,17 +113,24 @@ header p {
     color: #17a2b8; /* Bootstrap Info Color (Teal) */
     font-weight: bold;
     font-size: 1.2em;
+    animation: fadeIn 1s ease-out;
 }
 
 #random-allergy-definition {
     color: #555;
     font-style: italic;
     margin-top: 0.5rem;
+    animation: fadeIn 1s ease-out;
 }
 
 /* Button Styling */
 button {
     cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+button:active {
+    transform: scale(0.98);
 }
 
 /* File Input Styling */
@@ -119,12 +143,22 @@ img#allergy-preview {
     max-width: 100%;
     height: auto;
     border-radius: 0.25rem;
+    animation: fadeIn 1s ease-out;
 }
 
 canvas#captured-image {
     max-width: 100%;
     height: auto;
     border-radius: 0.25rem;
+    animation: fadeIn 1s ease-out;
+}
+
+/* Loading Spinner Styling */
+#loading-spinner {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    animation: fadeIn 0.5s ease-out;
 }
 
 /* Responsive Adjustments */
@@ -147,51 +181,32 @@ canvas#captured-image {
     }
 }
 
-/* Spinner Styling (Optional for Loading Indicators) */
-.spinner-border {
-    width: 3rem;
-    height: 3rem;
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
 }
 
-/* Custom Alert Styling */
-.alert {
-    display: flex;
-    align-items: center;
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
-/* Additional Custom Styles (Optional) */
-
-/* Form Labels */
-.form-label {
-    font-weight: 500;
+@keyframes fadeInDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
-/* Textarea Styling */
-textarea.form-control {
-    resize: vertical;
+@keyframes slideInLeft {
+    from { opacity: 0; transform: translateX(-20px); }
+    to { opacity: 1; transform: translateX(0); }
 }
 
-/* Select Picker Customization */
-.bootstrap-select .dropdown-toggle {
-    height: calc(2.25rem + 2px);
-    padding: 0.375rem 0.75rem;
-}
-
-.bootstrap-select .dropdown-menu {
-    max-height: 300px;
-    overflow-y: auto;
-}
-
-/* Footer Styling */
-footer {
-    background-color: #343a40; /* Bootstrap Dark Color */
-    color: #fff;
-    padding: 1rem 0;
-}
-
-footer p {
-    margin: 0;
-    font-size: 1rem;
+@keyframes bounceIn {
+    0% { transform: scale(0.3); opacity: 0; }
+    50% { transform: scale(1.05); opacity: 1; }
+    70% { transform: scale(0.9); }
+    100% { transform: scale(1); }
 }
 
 /* Additional Styling for Buttons */
