@@ -212,7 +212,9 @@ function getAnalysisResult(ingredientsText) {
     // Check each user-saved allergen against the ingredients text
     userAllergies.forEach(allergen => {
         const lowerCaseAllergen = allergen.toLowerCase();
-        if (lowerCaseIngredients.includes(lowerCaseAllergen)) {
+        // Use word boundaries to match whole words only
+        const regex = new RegExp(`\\b${lowerCaseAllergen}\\b`, 'i');
+        if (regex.test(lowerCaseIngredients)) {
             detectedAllergens.push(allergen);
         }
     });
@@ -481,12 +483,18 @@ allergyImageUpload.addEventListener('change', async (event) => {
             const extractedAllergy = result.data.text.trim();
 
             if (extractedAllergy) {
+                // Normalize the extracted allergy (capitalize first letters)
+                const formattedAllergy = extractedAllergy
+                    .split(' ')
+                    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+                    .join(' ');
+
                 // Check if the extracted allergy is already in userAllergies
-                if (!userAllergies.includes(extractedAllergy)) {
-                    userAllergies.push(extractedAllergy);
+                if (!userAllergies.some(a => a.toLowerCase() === formattedAllergy.toLowerCase())) {
+                    userAllergies.push(formattedAllergy);
                     // Update the allergies select field
                     for (let option of allergiesSelect.options) {
-                        if (option.value.toLowerCase() === extractedAllergy.toLowerCase()) {
+                        if (option.value.toLowerCase() === formattedAllergy.toLowerCase()) {
                             option.selected = true;
                             break;
                         }
@@ -495,9 +503,9 @@ allergyImageUpload.addEventListener('change', async (event) => {
                     $('.selectpicker').selectpicker('refresh');
                     // Save updated allergies to localStorage
                     localStorage.setItem('allergies', userAllergies.join(', '));
-                    alert(`Allergy "${extractedAllergy}" added to your profile.`);
+                    alert(`Allergy "${formattedAllergy}" added to your profile.`);
                 } else {
-                    alert(`Allergy "${extractedAllergy}" is already in your profile.`);
+                    alert(`Allergy "${formattedAllergy}" is already in your profile.`);
                 }
             } else {
                 alert("No allergen text detected in the uploaded image.");
