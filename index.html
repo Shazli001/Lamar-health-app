@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Health & Safety Scanner</title>
+    <!-- Link to CSS -->
+    <link rel="stylesheet" href="style.css">
+    <!-- Google Fonts -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Tesseract.js for OCR -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/5.1.0/tesseract.min.js"></script>
+</head>
+<body>
+    <header>
+        <h1>Health & Safety Scanner</h1>
+        <p class="subtitle">Scan, Analyze, Stay Safe</p>
+    </header>
+
+    <main>
+        <!-- User Profile Section -->
+        <section id="profile-area" class="card">
+            <h2>Your Profile</h2>
+            <div>
+                <label for="allergies">Known Allergies/Sensitivities:</label>
+                <!-- Multi-select Drop-down Menu -->
+                <select id="allergies" multiple>
+                    <option value="Celery">Celery</option>
+                    <option value="Eggs">Eggs</option>
+                    <option value="Fish">Fish</option>
+                    <option value="Gluten">Gluten</option>
+                    <option value="Lupin">Lupin</option>
+                    <option value="Milk">Milk</option>
+                    <option value="Molluscs">Molluscs</option>
+                    <option value="Mustard">Mustard</option>
+                    <option value="Peanuts">Peanuts</option>
+                    <option value="Sesame">Sesame</option>
+                    <option value="Shellfish">Shellfish</option>
+                    <option value="Sulfites">Sulfites</option>
+                    <option value="Soy">Soy</option>
+                    <option value="Tree Nuts">Tree Nuts</option>
+                </select>
+            </div>
+            <div>
+                <label for="allergy-image-upload">Upload Allergy Image:</label>
+                <input type="file" id="allergy-image-upload" accept="image/*">
+                <img id="allergy-preview" src="#" alt="Uploaded Allergy" style="display: none;">
+            </div>
+            <button id="save-profile" class="primary-button">Save Profile</button>
+        </section>
+
+        <!-- Product Scan Section -->
+        <section id="scan-area" class="card">
+            <h2>Scan Product</h2>
+            <p>Use your camera or upload an image of the product label.</p>
+
+            <div class="scan-options">
+                <button id="open-camera-button" class="secondary-button">Open Camera</button>
+                <input type="file" id="image-upload" accept="image/*" class="upload-button">
+            </div>
+
+            <video id="camera-view" style="display: none;"></video>
+            <button id="capture-button" style="display: none;" class="secondary-button">Capture Image</button>
+            <canvas id="captured-image" style="display: none;"></canvas>
+            <button id="analyze-image-button" style="display: none;" class="primary-button">Analyze Image</button>
+
+            <div class="manual-input">
+                <p>Or enter ingredients manually:</p>
+                <textarea id="product-input" placeholder="Enter product ingredients"></textarea>
+                <button id="scan-button" class="primary-button">Analyze Text</button>
+            </div>
+        </section>
+
+        <!-- Analysis Results Section -->
+        <section id="results-area" class="card">
+            <h2>Analysis Results</h2>
+            <p id="results-text">
+                <i id="result-icon" class=""></i>
+                <span id="result-message"></span>
+            </p>
+            <!-- Extracted ingredients textarea -->
+            <textarea id="extracted-ingredients" placeholder="Extracted ingredients will appear here..." readonly></textarea>
+        </section>
+
+        <!-- Random Allergy Information -->
+        <section id="random-allergy-area" class="card">
+            <h2>Did You Know?</h2>
+            <p><span id="random-allergy-name" class="allergy-name"></span></p>
+            <p class="allergy-definition"><span id="random-allergy-definition"></span></p>
+        </section>
+
+        <!-- Ingredient Glossary -->
+        <section id="glossary-area" class="card">
+            <h2>Ingredient Glossary</h2>
+            <ul id="glossary-list"></ul>
+        </section>
+    </main>
+
+    <footer>
+        <p>© Copyright Made by Lamar Ahmed Amer 2025</p>
+    </footer>
+
+    <!-- Link to JavaScript -->
+    <script src="script.js"></script>
+</body>
+</html>
