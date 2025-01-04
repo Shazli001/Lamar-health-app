@@ -271,6 +271,7 @@ function performAnalysis(ingredientsText) {
 scanButton.addEventListener('click', () => {
     const productText = productInput.value.trim();
     if (productText) {
+        console.log("Analyzing text:", productText);
         // Analyze the ingredients against user-saved allergens
         performAnalysis(productText);
     } else {
@@ -424,15 +425,17 @@ analyzeImageButton.addEventListener('click', async () => {
         return; // Stop execution
     }
 
+    const imageData = capturedImageCanvas.toDataURL('image/png');
     extractedIngredientsTextarea.value = "Analyzing...";
 
     try {
         const result = await Tesseract.recognize(
-            capturedImageCanvas,
+            imageData,
             'eng',
             { logger: m => console.log('Tesseract Log:', m) }
         );
         const extractedText = result.data.text.trim();
+        console.log("Extracted Text:", extractedText);
         performAnalysis(extractedText);
     } catch (error) {
         console.error("OCR Error:", error);
@@ -464,7 +467,6 @@ analyzeImageButton.addEventListener('click', async () => {
         resultsMessage.classList.add('show');
         // Clear extracted ingredients textarea
         extractedIngredientsTextarea.value = "";
-
     } finally {
         // Hide loading spinner
         loadingSpinner.classList.add('d-none');
@@ -507,6 +509,7 @@ allergyImageUpload.addEventListener('change', async (event) => {
                 { logger: m => console.log(m) }
             );
             const extractedAllergy = result.data.text.trim();
+            console.log("Extracted Allergy:", extractedAllergy);
 
             if (extractedAllergy) {
                 // Normalize the extracted allergy (capitalize first letters)
@@ -514,6 +517,8 @@ allergyImageUpload.addEventListener('change', async (event) => {
                     .split(' ')
                     .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
                     .join(' ');
+
+                console.log("Formatted Allergy:", formattedAllergy);
 
                 // Check if the extracted allergy is already in userAllergies
                 if (!userAllergies.some(a => a.toLowerCase() === formattedAllergy.toLowerCase())) {
