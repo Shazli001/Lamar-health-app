@@ -4,105 +4,142 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Health & Safety Scanner</title>
-    <!-- Link to CSS -->
-    <link rel="stylesheet" href="style.css">
-    <!-- Google Fonts -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Select CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-select@1.14.0-beta3/dist/css/bootstrap-select.min.css">
     <!-- Font Awesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Tesseract.js for OCR -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/5.1.0/tesseract.min.js"></script>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <header>
-        <h1>Health & Safety Scanner</h1>
-        <p class="subtitle">Scan, Analyze, Stay Safe</p>
+    <header class="bg-primary text-white text-center py-4 mb-4">
+        <div class="container">
+            <h1 class="display-4">Health & Safety Scanner</h1>
+            <p class="lead">Scan, Analyze, Stay Safe</p>
+        </div>
     </header>
 
-    <main>
-        <!-- User Profile Section -->
-        <section id="profile-area" class="card">
-            <h2>Your Profile</h2>
-            <div>
-                <label for="allergies">Known Allergies/Sensitivities:</label>
-                <!-- Multi-select Drop-down Menu -->
-                <select id="allergies" multiple>
-                    <option value="Celery">Celery</option>
-                    <option value="Eggs">Eggs</option>
-                    <option value="Fish">Fish</option>
-                    <option value="Gluten">Gluten</option>
-                    <option value="Lupin">Lupin</option>
-                    <option value="Milk">Milk</option>
-                    <option value="Molluscs">Molluscs</option>
-                    <option value="Mustard">Mustard</option>
-                    <option value="Peanuts">Peanuts</option>
-                    <option value="Sesame">Sesame</option>
-                    <option value="Shellfish">Shellfish</option>
-                    <option value="Sulfites">Sulfites</option>
-                    <option value="Soy">Soy</option>
-                    <option value="Tree Nuts">Tree Nuts</option>
-                </select>
-            </div>
-            <div>
-                <label for="allergy-image-upload">Upload Allergy Image:</label>
-                <input type="file" id="allergy-image-upload" accept="image/*">
-                <img id="allergy-preview" src="#" alt="Uploaded Allergy" style="display: none;">
-            </div>
-            <button id="save-profile" class="primary-button">Save Profile</button>
-        </section>
-
-        <!-- Product Scan Section -->
-        <section id="scan-area" class="card">
-            <h2>Scan Product</h2>
-            <p>Use your camera or upload an image of the product label.</p>
-
-            <div class="scan-options">
-                <button id="open-camera-button" class="secondary-button">Open Camera</button>
-                <input type="file" id="image-upload" accept="image/*" class="upload-button">
+    <main class="container">
+        <div class="row g-4">
+            <!-- User Profile Section -->
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h2 class="card-title">Your Profile</h2>
+                        <form>
+                            <div class="mb-3">
+                                <label for="allergies" class="form-label">Known Allergies/Sensitivities:</label>
+                                <!-- Enhanced Multi-select Drop-down -->
+                                <select id="allergies" class="selectpicker form-control" multiple data-live-search="true" data-actions-box="true" title="Select your allergies">
+                                    <option value="Celery">Celery</option>
+                                    <option value="Eggs">Eggs</option>
+                                    <option value="Fish">Fish</option>
+                                    <option value="Gluten">Gluten</option>
+                                    <option value="Lupin">Lupin</option>
+                                    <option value="Milk">Milk</option>
+                                    <option value="Molluscs">Molluscs</option>
+                                    <option value="Mustard">Mustard</option>
+                                    <option value="Peanuts">Peanuts</option>
+                                    <option value="Sesame">Sesame</option>
+                                    <option value="Shellfish">Shellfish</option>
+                                    <option value="Sulfites">Sulfites</option>
+                                    <option value="Soy">Soy</option>
+                                    <option value="Tree Nuts">Tree Nuts</option>
+                                    <!-- Add more allergens as needed -->
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="allergy-image-upload" class="form-label">Upload Allergy Image:</label>
+                                <input type="file" id="allergy-image-upload" accept="image/*" class="form-control">
+                                <img id="allergy-preview" src="#" alt="Uploaded Allergy" class="img-thumbnail mt-2" style="display: none; max-height: 200px;">
+                            </div>
+                            <button type="button" id="save-profile" class="btn btn-success">Save Profile</button>
+                        </form>
+                    </div>
+                </div>
             </div>
 
-            <video id="camera-view" style="display: none;"></video>
-            <button id="capture-button" style="display: none;" class="secondary-button">Capture Image</button>
-            <canvas id="captured-image" style="display: none;"></canvas>
-            <button id="analyze-image-button" style="display: none;" class="primary-button">Analyze Image</button>
-
-            <div class="manual-input">
-                <p>Or enter ingredients manually:</p>
-                <textarea id="product-input" placeholder="Enter product ingredients"></textarea>
-                <button id="scan-button" class="primary-button">Analyze Text</button>
+            <!-- Product Scan Section -->
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h2 class="card-title">Scan Product</h2>
+                        <p class="card-text">Use your camera or upload an image of the product label.</p>
+                        <div class="mb-3">
+                            <button id="open-camera-button" class="btn btn-secondary me-2"><i class="fas fa-camera"></i> Open Camera</button>
+                            <input type="file" id="image-upload" accept="image/*" class="form-control d-inline-block w-auto">
+                        </div>
+                        <div class="mb-3">
+                            <video id="camera-view" class="img-fluid rounded" style="display: none;" autoplay></video>
+                            <button id="capture-button" class="btn btn-secondary mt-2" style="display: none;">Capture Image</button>
+                            <canvas id="captured-image" class="img-fluid rounded mt-2" style="display: none;"></canvas>
+                            <button id="analyze-image-button" class="btn btn-primary mt-2" style="display: none;">Analyze Image</button>
+                        </div>
+                        <hr>
+                        <div class="mb-3">
+                            <label for="product-input" class="form-label">Or enter ingredients manually:</label>
+                            <textarea id="product-input" class="form-control" rows="3" placeholder="Enter product ingredients"></textarea>
+                        </div>
+                        <button id="scan-button" class="btn btn-primary">Analyze Text</button>
+                    </div>
+                </div>
             </div>
-        </section>
 
-        <!-- Analysis Results Section -->
-        <section id="results-area" class="card">
-            <h2>Analysis Results</h2>
-            <p id="results-text">
-                <i id="result-icon" class=""></i>
-                <span id="result-message"></span>
-            </p>
-            <!-- Extracted ingredients textarea -->
-            <textarea id="extracted-ingredients" placeholder="Extracted ingredients will appear here..." readonly></textarea>
-        </section>
+            <!-- Analysis Results Section -->
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h2 class="card-title">Analysis Results</h2>
+                        <div class="alert" role="alert" id="results-text">
+                            <i id="result-icon" class=""></i>
+                            <span id="result-message"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label for="extracted-ingredients" class="form-label">Extracted Ingredients:</label>
+                            <textarea id="extracted-ingredients" class="form-control" rows="3" readonly placeholder="Extracted ingredients will appear here..."></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-        <!-- Random Allergy Information -->
-        <section id="random-allergy-area" class="card">
-            <h2>Did You Know?</h2>
-            <p><span id="random-allergy-name" class="allergy-name"></span></p>
-            <p class="allergy-definition"><span id="random-allergy-definition"></span></p>
-        </section>
+            <!-- Random Allergy Information -->
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h2 class="card-title">Did You Know?</h2>
+                        <p><strong id="random-allergy-name" class="allergy-name"></strong></p>
+                        <p id="random-allergy-definition" class="allergy-definition"></p>
+                    </div>
+                </div>
+            </div>
 
-        <!-- Ingredient Glossary -->
-        <section id="glossary-area" class="card">
-            <h2>Ingredient Glossary</h2>
-            <ul id="glossary-list"></ul>
-        </section>
+            <!-- Ingredient Glossary -->
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h2 class="card-title">Ingredient Glossary</h2>
+                        <ul id="glossary-list" class="list-group list-group-flush"></ul>
+                    </div>
+                </div>
+            </div>
+        </div>
     </main>
 
-    <footer>
-        <p>© Copyright Made by Lamar Ahmed Amer 2025</p>
+    <footer class="bg-dark text-white text-center py-3 mt-4">
+        <div class="container">
+            <p class="mb-0">© 2025 Health & Safety Scanner by Lamar Ahmed Amer</p>
+        </div>
     </footer>
 
-    <!-- Link to JavaScript -->
+    <!-- Bootstrap JS Bundle (includes Popper) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Bootstrap Select JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.14.0-beta3/dist/js/bootstrap-select.min.js"></script>
+
+    <!-- Custom JS -->
     <script src="script.js"></script>
 </body>
 </html>
