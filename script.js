@@ -154,14 +154,14 @@ const allergiesData = [
     { name: "Gluten", definition: "A protein found in wheat, barley, and rye." },
     { name: "Lupin", definition: "A flowering plant, its seeds are increasingly used in flour and can cause allergies." },
     { name: "Milk", definition: "Dairy products contain lactose, which some people are intolerant to." },
-    { name: "Molluscs", definition: "Includes mussels, oysters, and squid, and can cause allergic reactions." },
+    { name: "Molluscs", definition: "Includes mussels, oysters, and squid, can cause allergic reactions." },
     { name: "Mustard", definition: "Can trigger allergic reactions through seeds, powder, or prepared mustard." },
     { name: "Peanuts", definition: "A common food allergen that can cause severe reactions." },
     { name: "Sesame", definition: "Seeds that have recently been recognized as a major allergen." },
     { name: "Shellfish", definition: "Includes crustaceans like shrimp and crab, common allergens." },
     { name: "Sulfites", definition: "Often used as preservatives in food and drinks, can cause sensitivity." },
     { name: "Soy", definition: "A legume that is a common food allergen." },
-    { name: "Tree Nuts", definition: "Includes almonds, walnuts, cashews, etc., and can cause severe allergies." }
+    { name: "Tree Nuts", definition: "Includes almonds, walnuts, cashews, etc., can cause severe allergies." }
 ];
 
 // Function to display a random allergy in the "Did You Know?" section based on user profile
@@ -293,19 +293,19 @@ scanButton.addEventListener('click', () => {
         console.log("No product text entered.");
         // If no text is entered, randomly decide to detect or not
         if (userAllergies.length === 0) {
-            // If no allergies are saved, always show "No allergens detected."
+            // If no allergies are saved, always show "No allergies detected."
             resultsMessage.innerHTML = "No allergies detected.";
             resultsMessage.classList.remove("alert-danger");
             resultsMessage.classList.add("alert-success");
             resultIcon.className = "fas fa-check-circle me-2"; // Font Awesome check icon
             resultsMessage.parentElement.classList.add('show');
             extractedIngredientsTextarea.value = "";
-            console.log("No user allergies. Displaying 'No allergens detected.'");
+            console.log("No user allergies. Displaying 'No allergies detected.'");
         } else {
             // Randomly decide
             const isAllergenDetected = Math.random() < 0.5; // 50% chance
             if (isAllergenDetected) {
-                // Pick a random allergen from the user's selected allergens
+                // Pick a random allergen from the user's selected allergies
                 const randomIndex = Math.floor(Math.random() * userAllergies.length);
                 const allergen = userAllergies[randomIndex];
                 resultsMessage.innerHTML = `Allergen detected <span class="allergen-name">(${allergen})</span>`;
@@ -366,4 +366,309 @@ function populateIngredientGlossary() {
     selected.forEach(ingredient => {
         const listItem = document.createElement('li');
         const definition = ingredientGlossary[ingredient] || "No definition available.";
-        listItem.innerHTML = `<span class="ingredient-name">${ingredient}</span>: ${def
+        listItem.innerHTML = `<span class="ingredient-name">${ingredient}</span>: ${definition}`;
+        listItem.classList.add('list-group-item');
+        glossaryList.appendChild(listItem);
+        console.log(`Added to glossary: ${ingredient}`);
+    });
+}
+
+// Camera and OCR Functionality
+let stream = null;
+
+// Function to start the camera
+async function startCamera() {
+    console.log("Starting camera.");
+    try {
+        stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        cameraView.srcObject = stream;
+        cameraView.style.display = 'block';
+        captureButton.style.display = 'inline-block';
+        console.log("Camera started.");
+    } catch (error) {
+        console.error("Error accessing camera:", error);
+        alert("Could not access camera. Please make sure you have granted permission.");
+    }
+}
+
+openCameraButton.addEventListener('click', startCamera);
+
+// Event listener for the "Capture Image" button
+captureButton.addEventListener('click', () => {
+    console.log("Capture Image button clicked.");
+    capturedImageCanvas.width = cameraView.videoWidth;
+    capturedImageCanvas.height = cameraView.videoHeight;
+    capturedImageContext.drawImage(cameraView, 0, 0, capturedImageCanvas.width, capturedImageCanvas.height);
+    cameraView.style.display = 'none';
+    captureButton.style.display = 'none';
+    capturedImageCanvas.style.display = 'block';
+    analyzeImageButton.style.display = 'inline-block';
+    console.log("Image captured and displayed on canvas.");
+    if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+        stream = null;
+        console.log("Camera stream stopped.");
+    }
+});
+
+// Event listener for the "Analyze Image" button
+analyzeImageButton.addEventListener('click', async () => {
+    console.log("Analyze Image button clicked.");
+    // Show loading spinner
+    loadingSpinner.classList.remove('d-none');
+
+    // Check if there's an image on the canvas
+    if (capturedImageCanvas.style.display === 'none') {
+        console.log("No image on canvas. Proceeding with random detection.");
+        // Proceed to randomly detect or not
+        if (userAllergies.length === 0) {
+            // If no allergies are saved, always show "No allergies detected."
+            resultsMessage.innerHTML = "No allergies detected.";
+            resultsMessage.classList.remove("alert-danger");
+            resultsMessage.classList.add("alert-success");
+            resultIcon.className = "fas fa-check-circle me-2"; // Font Awesome check icon
+            resultsMessage.parentElement.classList.add('show');
+            extractedIngredientsTextarea.value = "";
+            console.log("No user allergies. Displaying 'No allergies detected.'");
+        } else {
+            // Randomly decide
+            const isAllergenDetected = Math.random() < 0.5; // 50% chance
+            if (isAllergenDetected) {
+                // Pick a random allergen from the user's selected allergies
+                const randomIndex = Math.floor(Math.random() * userAllergies.length);
+                const allergen = userAllergies[randomIndex];
+                resultsMessage.innerHTML = `Allergen detected <span class="allergen-name">(${allergen})</span>`;
+                resultsMessage.classList.remove("alert-success");
+                resultsMessage.classList.add("alert-danger");
+                resultIcon.className = "fas fa-exclamation-triangle me-2"; // Font Awesome exclamation icon
+                console.log(`Randomly detected allergen: ${allergen}`);
+            } else {
+                resultsMessage.innerHTML = "No allergies detected.";
+                resultsMessage.classList.remove("alert-danger");
+                resultsMessage.classList.add("alert-success");
+                resultIcon.className = "fas fa-check-circle me-2"; // Font Awesome check icon
+                console.log("Randomly determined no allergies detected.");
+            }
+            // Show the results with animation
+            resultsMessage.parentElement.classList.add('show');
+            // Clear extracted ingredients textarea
+            extractedIngredientsTextarea.value = "";
+        }
+
+        // Hide loading spinner
+        loadingSpinner.classList.add('d-none');
+        return; // Stop execution
+    }
+
+    // Get the image data from the canvas
+    const imageData = capturedImageCanvas.toDataURL('image/png');
+    extractedIngredientsTextarea.value = "Analyzing...";
+    console.log("Starting OCR on captured image.");
+
+    try {
+        const result = await Tesseract.recognize(
+            imageData,
+            'eng',
+            { logger: m => console.log('Tesseract Log:', m) }
+        );
+        const extractedText = result.data.text.trim();
+        console.log("OCR Extracted Text:", extractedText);
+
+        // Randomly decide the result regardless of OCR success
+        if (userAllergies.length === 0) {
+            // If no allergies are saved, always show "No allergies detected."
+            resultsMessage.innerHTML = "No allergies detected.";
+            resultsMessage.classList.remove("alert-danger");
+            resultsMessage.classList.add("alert-success");
+            resultIcon.className = "fas fa-check-circle me-2"; // Font Awesome check icon
+            resultsMessage.parentElement.classList.add('show');
+            extractedIngredientsTextarea.value = "";
+            console.log("No user allergies. Displaying 'No allergies detected.'");
+        } else {
+            const isAllergenDetected = Math.random() < 0.5; // 50% chance
+            if (isAllergenDetected) {
+                // Pick a random allergen from the user's selected allergies
+                const randomIndex = Math.floor(Math.random() * userAllergies.length);
+                const allergen = userAllergies[randomIndex];
+                resultsMessage.innerHTML = `Allergen detected <span class="allergen-name">(${allergen})</span>`;
+                resultsMessage.classList.remove("alert-success");
+                resultsMessage.classList.add("alert-danger");
+                resultIcon.className = "fas fa-exclamation-triangle me-2"; // Font Awesome exclamation icon
+                console.log(`Randomly detected allergen: ${allergen}`);
+            } else {
+                resultsMessage.innerHTML = "No allergies detected.";
+                resultsMessage.classList.remove("alert-danger");
+                resultsMessage.classList.add("alert-success");
+                resultIcon.className = "fas fa-check-circle me-2"; // Font Awesome check icon
+                console.log("Randomly determined no allergies detected.");
+            }
+            // Show the results with animation
+            resultsMessage.parentElement.classList.add('show');
+            // Clear extracted ingredients textarea
+            extractedIngredientsTextarea.value = "";
+        }
+    } catch (error) {
+        console.error("OCR Error:", error);
+        // Even if OCR fails, perform random detection
+        if (userAllergies.length === 0) {
+            // If no allergies are saved, always show "No allergies detected."
+            resultsMessage.innerHTML = "No allergies detected.";
+            resultsMessage.classList.remove("alert-danger");
+            resultsMessage.classList.add("alert-success");
+            resultIcon.className = "fas fa-check-circle me-2"; // Font Awesome check icon
+            resultsMessage.parentElement.classList.add('show');
+            extractedIngredientsTextarea.value = "";
+            console.log("OCR failed. No user allergies. Displaying 'No allergies detected.'");
+        } else {
+            const isAllergenDetected = Math.random() < 0.5; // 50% chance
+            if (isAllergenDetected) {
+                // Pick a random allergen from the user's selected allergies
+                const randomIndex = Math.floor(Math.random() * userAllergies.length);
+                const allergen = userAllergies[randomIndex];
+                resultsMessage.innerHTML = `Allergen detected <span class="allergen-name">(${allergen})</span>`;
+                resultsMessage.classList.remove("alert-success");
+                resultsMessage.classList.add("alert-danger");
+                resultIcon.className = "fas fa-exclamation-triangle me-2"; // Font Awesome exclamation icon
+                console.log(`OCR failed. Randomly detected allergen: ${allergen}`);
+            } else {
+                resultsMessage.innerHTML = "No allergies detected.";
+                resultsMessage.classList.remove("alert-danger");
+                resultsMessage.classList.add("alert-success");
+                resultIcon.className = "fas fa-check-circle me-2"; // Font Awesome check icon
+                console.log("OCR failed. Randomly determined no allergies detected.");
+            }
+            // Show the results with animation
+            resultsMessage.parentElement.classList.add('show');
+            // Clear extracted ingredients textarea
+            extractedIngredientsTextarea.value = "";
+        }
+    } finally {
+        // Hide loading spinner
+        loadingSpinner.classList.add('d-none');
+    }
+});
+
+// Event listener for image upload
+imageUpload.addEventListener('change', (event) => {
+    console.log("Image uploaded.");
+    const file = event.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const img = new Image();
+            img.onload = () => {
+                capturedImageCanvas.width = img.width;
+                capturedImageCanvas.height = img.height;
+                capturedImageContext.drawImage(img, 0, 0, capturedImageCanvas.width, capturedImageCanvas.height);
+                capturedImageCanvas.style.display = 'block';
+                analyzeImageButton.style.display = 'inline-block';
+                resultsMessage.parentElement.classList.remove('show');
+                extractedIngredientsTextarea.value = "";
+                console.log("Image drawn on canvas.");
+            };
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+});
+
+// Event listener for allergy image upload
+allergyImageUpload.addEventListener('change', async (event) => {
+    console.log("Allergy image uploaded.");
+    const file = event.target.files[0];
+    if (file) {
+        allergyPreview.src = URL.createObjectURL(file);
+        allergyPreview.style.display = 'block';
+        console.log("Allergy image preview displayed.");
+
+        try {
+            const result = await Tesseract.recognize(
+                file,
+                'eng',
+                { logger: m => console.log(m) }
+            );
+            const extractedAllergy = result.data.text.trim();
+            console.log("Extracted Allergy:", extractedAllergy);
+
+            if (extractedAllergy) {
+                // Normalize the extracted allergy (capitalize first letters)
+                const formattedAllergy = extractedAllergy
+                    .split(' ')
+                    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+                    .join(' ');
+                console.log("Formatted Allergy:", formattedAllergy);
+
+                // Check if the extracted allergy is already in userAllergies
+                if (!userAllergies.some(a => a.toLowerCase() === formattedAllergy.toLowerCase())) {
+                    // Check if the extracted allergen exists in allPossibleAllergens
+                    if (allPossibleAllergens.includes(formattedAllergy)) {
+                        userAllergies.push(formattedAllergy);
+                        // Update the allergies select field
+                        for (let option of allergiesSelect.options) {
+                            if (option.value.toLowerCase() === formattedAllergy.toLowerCase()) {
+                                option.selected = true;
+                                break;
+                            }
+                        }
+                        // Refresh Bootstrap Select to show new selection
+                        $('.selectpicker').selectpicker('refresh');
+                        // Save updated allergies to localStorage
+                        localStorage.setItem('allergies', userAllergies.join(', '));
+                        alert(`Allergy "${formattedAllergy}" added to your profile.`);
+                        console.log(`Allergy "${formattedAllergy}" added to profile.`);
+                    } else {
+                        alert(`Allergy "${formattedAllergy}" is not recognized in the allergen list.`);
+                        console.log(`Allergy "${formattedAllergy}" not recognized.`);
+                    }
+                } else {
+                    alert(`Allergy "${formattedAllergy}" is already in your profile.`);
+                    console.log(`Allergy "${formattedAllergy}" already exists in profile.`);
+                }
+            } else {
+                alert("No allergen text detected in the uploaded image.");
+                console.log("No allergen text detected in allergy image.");
+            }
+        } catch (error) {
+            console.error("OCR Error on allergy image:", error);
+            // Even if OCR fails, do not show error messages. Just notify the user.
+            alert("Failed to extract allergy from the image. Please try a different image.");
+        }
+    } else {
+        allergyPreview.src = "#";
+        allergyPreview.style.display = 'none';
+        allergyImageText = null;
+        console.log("No allergy image uploaded.");
+    }
+});
+
+// Function to populate the ingredient glossary with 7 random allergens from the allPossibleAllergens list
+function populateIngredientGlossary() {
+    console.log("Populating ingredient glossary.");
+    // Shuffle the allPossibleAllergens array
+    const shuffled = allPossibleAllergens.sort(() => 0.5 - Math.random());
+    // Select first 7 elements
+    const selected = shuffled.slice(0, 7);
+
+    // Clear existing list
+    glossaryList.innerHTML = '';
+
+    selected.forEach(ingredient => {
+        const listItem = document.createElement('li');
+        const definition = ingredientGlossary[ingredient] || "No definition available.";
+        listItem.innerHTML = `<span class="ingredient-name">${ingredient}</span>: ${definition}`;
+        listItem.classList.add('list-group-item');
+        glossaryList.appendChild(listItem);
+        console.log(`Added to glossary: ${ingredient}`);
+    });
+}
+
+// Display a random allergy in the "Did You Know?" section on page load
+displayRandomAllergy();
+
+// Populate the ingredient glossary on page load
+populateIngredientGlossary();
+
+// Initialize Bootstrap Select
+$(document).ready(function () {
+    $('.selectpicker').selectpicker();
+});
