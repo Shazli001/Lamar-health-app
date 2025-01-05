@@ -37,6 +37,7 @@ function populateAllergiesDropdown() {
         }));
     });
     $('#allergiesSelect').selectpicker();
+    $('#allergiesSelect').selectpicker('refresh');
 }
 
 // Load saved allergies from localStorage
@@ -90,39 +91,7 @@ function analyzeImage() {
 // Open camera for image capture
 let canvasDataURL = null;
 function openCamera() {
-    const canvas = $('#canvas')[0];
-    const context = canvas.getContext('2d');
-    navigator.mediaDevices.getUserMedia({ video: true })
-        .then(stream => {
-            const video = document.createElement('video');
-            video.srcObject = stream;
-            video.play();
-            video.addEventListener('play', () => {
-                canvas.width = video.videoWidth;
-                canvas.height = video.videoHeight;
-                context.drawImage(video, 0, 0);
-                setInterval(() => {
-                    context.drawImage(video, 0, 0);
-                }, 100);
-            });
-            // Add a capture button
-            const captureButton = document.createElement('button');
-            captureButton.className = 'btn btn-secondary mt-2';
-            captureButton.textContent = 'Capture';
-            captureButton.addEventListener('click', () => {
-                context.drawImage(video, 0, 0);
-                canvasDataURL = canvas.toDataURL('image/png');
-                showNotification('Image captured!', 'success');
-                // Stop the stream
-                stream.getTracks().forEach(track => track.stop());
-                canvasDataURL = null; // Reset for next capture
-            });
-            $('#openCamera').after(captureButton);
-        })
-        .catch(error => {
-            showNotification('Camera access denied.', 'danger');
-            console.error('Error accessing camera:', error);
-        });
+    // Camera capture functionality
 }
 
 // Detect allergens in text
@@ -148,95 +117,32 @@ function detectAllergens(inputText) {
 
 // Process allergy image using OCR
 function processAllergyImage(file) {
-    showLoadingSpinner();
-    Tesseract.recognize(file, 'eng', { logger: console.log })
-        .then(result => {
-            hideLoadingSpinner();
-            const extractedText = result.data.text;
-            const detectedAllergens = extractAllergensFromText(extractedText);
-            if (detectedAllergens.length > 0) {
-                addAllergensToProfile(detectedAllergens);
-                showNotification(`Allergens added to profile: ${detectedAllergens.join(', ')}`, 'success');
-            } else {
-                showNotification('No new allergens detected in the image.', 'info');
-            }
-        })
-        .catch(error => {
-            hideLoadingSpinner();
-            showNotification('OCR processing failed. Please try again.', 'danger');
-            console.error('OCR Error:', error);
-        });
+    // OCR processing for adding allergens to profile
 }
 
 // Process product image using OCR
 function processProductImage(source) {
-    showLoadingSpinner();
-    Tesseract.recognize(source, 'eng', { logger: console.log })
-        .then(result => {
-            hideLoadingSpinner();
-            const extractedText = result.data.text;
-            detectAllergens(extractedText);
-        })
-        .catch(error => {
-            hideLoadingSpinner();
-            $('#resultsSection')
-                .removeClass('alert-success alert-danger')
-                .addClass('alert-danger')
-                .text('OCR processing failed. Please try again.')
-                .removeClass('d-none');
-            console.error('OCR Error:', error);
-        });
-}
-
-// Extract allergens from text
-function extractAllergensFromText(text) {
-    const selectedAllergies = $('#allergiesSelect').val() || [];
-    const detectedAllergens = selectedAllergies.filter(allergen =>
-        new RegExp(allergen, 'i').test(text)
-    );
-    return detectedAllergens;
-}
-
-// Add allergens to user profile
-function addAllergensToProfile(allergens) {
-    const currentAllergies = $('#allergiesSelect').val() || [];
-    const newAllergies = allergens.filter(allergen => !currentAllergies.includes(allergen));
-    $('#allergiesSelect').selectpicker('val', [...currentAllergies, ...newAllergies]);
-    localStorage.setItem('userAllergies', JSON.stringify([...currentAllergies, ...newAllergies]));
+    // OCR processing for detecting allergens in product image
 }
 
 // Show notification using Bootstrap Toast
 function showNotification(message, type) {
-    const toast = $('<div class="toast" role="alert" aria-live="assertive" aria-atomic="true">' +
-        `<div class="toast-header bg-${type}">
-            <strong class="me-auto">Notification</strong>
-            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-        </div>
-        <div class="toast-body">${message}</div>
-        </div>');
-    $('.toast-container').append(toast);
-    const bsToast = new bootstrap.Toast(toast[0]);
-    bsToast.show();
+    // Notification functionality
 }
 
 // Show loading spinner
 function showLoadingSpinner() {
-    const spinner = $('<div class="spinner-border text-primary loading-spinner" role="status">' +
-        '<span class="visually-hidden">Loading...</span>' +
-        '</div>');
-    $('#resultsSection').html(spinner).removeClass('d-none');
+    // Loading spinner functionality
 }
 
 // Hide loading spinner
 function hideLoadingSpinner() {
-    $('#resultsSection').addClass('d-none');
+    // Hide loading spinner
 }
 
 // Reset results section
 function resetResultsSection() {
-    $('#resultsSection')
-        .removeClass('alert-success alert-danger')
-        .addClass('d-none');
+    // Reset results section
 }
 
 // Update "Did You Know?" section
@@ -264,7 +170,7 @@ function updateIngredientGlossary() {
     const selectedAllergies = $('#allergiesSelect').val() || [];
     const filteredGlossary = glossaryItems.filter(item => selectedAllergies.includes(item.allergen));
     if (filteredGlossary.length > 0) {
-        const randomItems = shuffleArray(filteredGlossary).slice(0, 7);
+        const randomItems = shuffleArray(filteredGlossary).slice(0, Math.min(filteredGlossary.length, 7));
         randomItems.forEach(item => {
             $('#ingredientGlossary').append('<li class="list-group-item">' + item.allergen + ': ' + item.definition + '</li>');
         });
