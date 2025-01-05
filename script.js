@@ -144,7 +144,7 @@ const ingredientGlossary = {
     "Wheat": "A staple grain used in bread, pasta, and various baked goods.",
     "Yogurt": "A fermented dairy product rich in probiotics."
     // Add more as needed up to 50
-];
+};
 
 // List of common allergens for "Did You Know?" section
 const allergiesData = [
@@ -170,7 +170,7 @@ function displayRandomAllergy() {
     let relevantAllergies = [];
 
     if (userAllergies.length === 0) {
-        // If no allergies selected, use all possible allergens for tips
+        // If no allergies selected, use allPossibleAllergens for tips
         relevantAllergies = allPossibleAllergens;
         console.log("No user allergies selected. Using allPossibleAllergens for tips.");
     } else {
@@ -211,7 +211,7 @@ function getAnalysisResult(ingredientsText) {
         // If no allergies are saved, always show "No allergens detected."
         console.log("No user allergies. Returning 'No allergens detected.'");
         return {
-            message: "No allergens detected.",
+            message: "No allergies detected.",
             isWarning: false
         };
     }
@@ -219,12 +219,10 @@ function getAnalysisResult(ingredientsText) {
     // Initialize an array to hold detected allergens
     let detectedAllergens = [];
 
-    // Check each user-saved allergen against the ingredients text
+    // Check each user-saved allergen against the ingredients text using regex for word boundaries
     userAllergies.forEach(allergen => {
-        const lowerCaseAllergen = allergen.toLowerCase();
-        const lowerCaseIngredients = ingredientsText.toLowerCase();
-        // Use includes to detect substrings or partial matches
-        if (lowerCaseIngredients.includes(lowerCaseAllergen)) {
+        const regex = new RegExp(`\\b${allergen.toLowerCase()}\\b`, 'i');
+        if (regex.test(ingredientsText.toLowerCase())) {
             detectedAllergens.push(allergen);
             console.log(`Detected allergen: ${allergen}`);
         }
@@ -232,16 +230,16 @@ function getAnalysisResult(ingredientsText) {
 
     if (detectedAllergens.length > 0) {
         // Create a string of detected allergens, separated by commas
-        const allergensList = detectedAllergens.map(a => `<span class="allergen-name">${a}</span>`).join(', ');
+        const allergensList = detectedAllergens.map(a => `<span class="allergen-name">(${a})</span>`).join(', ');
         console.log("Detected allergens:", detectedAllergens);
         return {
-            message: `Allergen detected! ${allergensList}`,
+            message: `Allergen detected ${allergensList}`,
             isWarning: true
         };
     } else {
         console.log("No allergens detected in the provided ingredients.");
         return {
-            message: "No allergens detected.",
+            message: "No allergies detected.",
             isWarning: false
         };
     }
@@ -296,7 +294,7 @@ scanButton.addEventListener('click', () => {
         // If no text is entered, randomly decide to detect or not
         if (userAllergies.length === 0) {
             // If no allergies are saved, always show "No allergens detected."
-            resultsMessage.innerHTML = "No allergens detected.";
+            resultsMessage.innerHTML = "No allergies detected.";
             resultsMessage.classList.remove("alert-danger");
             resultsMessage.classList.add("alert-success");
             resultIcon.className = "fas fa-check-circle me-2"; // Font Awesome check icon
@@ -310,17 +308,17 @@ scanButton.addEventListener('click', () => {
                 // Pick a random allergen from the user's selected allergens
                 const randomIndex = Math.floor(Math.random() * userAllergies.length);
                 const allergen = userAllergies[randomIndex];
-                resultsMessage.innerHTML = `Allergen detected! <span class="allergen-name">${allergen}</span>`;
+                resultsMessage.innerHTML = `Allergen detected <span class="allergen-name">(${allergen})</span>`;
                 resultsMessage.classList.remove("alert-success");
                 resultsMessage.classList.add("alert-danger");
                 resultIcon.className = "fas fa-exclamation-triangle me-2"; // Font Awesome exclamation icon
                 console.log(`Randomly detected allergen: ${allergen}`);
             } else {
-                resultsMessage.innerHTML = "No allergens detected.";
+                resultsMessage.innerHTML = "No allergies detected.";
                 resultsMessage.classList.remove("alert-danger");
                 resultsMessage.classList.add("alert-success");
                 resultIcon.className = "fas fa-check-circle me-2"; // Font Awesome check icon
-                console.log("Randomly determined no allergens detected.");
+                console.log("Randomly determined no allergies detected.");
             }
             // Show the results with animation
             resultsMessage.parentElement.classList.add('show');
@@ -367,4 +365,5 @@ function populateIngredientGlossary() {
 
     selected.forEach(ingredient => {
         const listItem = document.createElement('li');
-        const definition = ingredientGlossary[ingredient] || "No definition available
+        const definition = ingredientGlossary[ingredient] || "No definition available.";
+        listItem.innerHTML = `<span class="ingredient-name">${ingredient}</span>: ${def
